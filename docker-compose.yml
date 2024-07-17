@@ -1,0 +1,75 @@
+# version: '3'
+
+# services:
+#   consul:
+#     image: consul:1.9.5
+#     ports:
+#       - "8500:8500"
+#     command: "agent -dev -client=0.0.0.0"
+
+#   service-a:
+#     build: ./service-a
+#     ports:
+#       - "3001:3001"
+#     environment:
+#       - CONSUL_URL=http://consul:8500
+#     networks:
+#       - app-network
+
+#   service-b:
+#     build: ./service-b
+#     ports:
+#       - "3002:3002"
+#     environment:
+#       - CONSUL_URL=http://consul:8500
+#     networks:
+#       - app-network
+
+#   nginx-consul:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile  # Ensure this points to your Dockerfile
+#     ports:
+#       - "8080:80"
+#     volumes:
+#       - ./nginx:/templates
+#       - ./start.sh:/bin/start.sh
+#     depends_on:
+#       - consul
+#       - service-a
+#       - service-b
+#     links:
+#       - consul
+#     networks:
+#       - app-network
+
+# networks:
+#   app-network:
+#     driver: bridge
+
+version: '3.8'
+
+services:
+  consul:
+    image: consul:1.9.5
+    ports:
+      - "8500:8500"
+    command: "agent -dev -client=0.0.0.0"
+
+  nginx-consul:
+    image: schizoid90/nginx-consul:0.19.5
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx:/templates
+      - ./start.sh:/bin/start.sh
+    depends_on:
+      - consul
+    links:
+      - consul
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
